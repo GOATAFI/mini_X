@@ -1,6 +1,6 @@
 <?php
 require '../db.php';
-session_start(); // Start the session to store login information
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['username'] = $user['username'];
         echo "Login successful!";
         // Redirect to the homepage or dashboard
-        // header("Location: index.php");
+        header("Location: http://localhost/Mini-X/homepage.php");
         exit;
     } else {
         echo "Invalid username/email or password.";
