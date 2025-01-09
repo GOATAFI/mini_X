@@ -12,8 +12,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $hashedPassword = password_hash($password, PASSWORD_BCRYPT); //PASSWORD_BCRYPT is used to create new password hashes using the CRYPT_BLOWFISH algorithm. This will always result in a hash using the "$2y$" crypt format, which is always 60 characters wide.
+    // Check if the username or email already exists
+    $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+    $checkStmt->execute([$username, $email]);
+    $count = $checkStmt->fetchColumn();
 
+    if ($count > 0) {
+        echo "Signup failed: Username or email already exists.";
+        exit;
+    }
+
+    // Hash the password
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+    // Insert into the database
     $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
     try {
         $stmt->execute([$username, $email, $hashedPassword]);
