@@ -23,7 +23,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
 <body>
     <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
     <p>You are now logged in.</p>
-    <a href="logout.php">Logout</a>
+    <a href="backend/routes/logout.php">Logout</a>
 </body>
 
 </html>
