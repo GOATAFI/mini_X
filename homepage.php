@@ -1,14 +1,19 @@
 <?php
 session_start();
 
-// Check if the user is logged in
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
-    // User is not logged in, redirect to the login page
-    header("Location: http://localhost/Mini-X/login.php");
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../../frontend/login.html");
     exit;
 }
 
-// If the user is logged in, display the homepage
+require 'backend/db.php';
+
+// Fetch all posts from the database
+$stmt = $pdo->query("SELECT posts.content, posts.created_at, users.username 
+                     FROM posts 
+                     JOIN users ON posts.user_id = users.id 
+                     ORDER BY posts.created_at DESC");
+$posts = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -22,8 +27,24 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
 
 <body>
     <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
-    <p>You are now logged in.</p>
-    <a href="backend/routes/logout.php">Logout</a>
+    <a href="../backend/routes/logout.php">Logout</a>
+
+    <h2>Post Something</h2>
+    <form action="../backend/routes/post.php" method="POST">
+        <textarea name="content" rows="4" cols="50" placeholder="What's on your mind?"></textarea>
+        <br>
+        <button type="submit">Post</button>
+    </form>
+
+    <h2>All Posts</h2>
+    <?php foreach ($posts as $post): ?>
+        <div>
+            <strong><?php echo htmlspecialchars($post['username']); ?>:</strong>
+            <p><?php echo htmlspecialchars($post['content']); ?></p>
+            <small>Posted on <?php echo $post['created_at']; ?></small>
+            <hr>
+        </div>
+    <?php endforeach; ?>
 </body>
 
 </html>
