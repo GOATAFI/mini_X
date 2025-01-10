@@ -8,12 +8,19 @@ if (!isset($_SESSION['user_id'])) {
 
 require 'backend/db.php';
 
+$currentUserId = $_SESSION['user_id'];
+
 // Fetch all posts from the database
 $stmt = $pdo->query("SELECT posts.content, posts.created_at, users.username 
                      FROM posts 
                      JOIN users ON posts.user_id = users.id 
                      ORDER BY posts.created_at DESC");
 $posts = $stmt->fetchAll();
+
+// Fetch users the current user may want to follow
+$usersStmt = $pdo->prepare("SELECT * FROM users WHERE id != ?");
+$usersStmt->execute([$currentUserId]);
+$users = $usersStmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -28,6 +35,35 @@ $posts = $stmt->fetchAll();
 <body>
     <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
     <a href="backend/routes/logout.php">Logout</a>
+
+    <!-- Suggest Users to Follow -->
+    <h2>Users You May Want to Follow</h2>
+    <?php foreach ($users as $user): ?>
+        <div>
+            <strong><?php echo htmlspecialchars($user['username']); ?></strong>
+
+            <?php
+            // Check if the logged-in user is already following this user
+            $checkFollowStmt = $pdo->prepare("SELECT COUNT(*) FROM follows WHERE follower_id = ? AND followee_id = ?");
+            $checkFollowStmt->execute([$currentUserId, $user['id']]);
+            $isFollowing = $checkFollowStmt->fetchColumn();
+            ?>
+
+            <?php if ($isFollowing): ?>
+                <!-- Unfollow Form -->
+                <form action="backend/routes/unfollow.php" method="POST">
+                    <input type="hidden" name="followee_id" value="<?php echo $user['id']; ?>">
+                    <button type="submit">Unfollow</button>
+                </form>
+            <?php else: ?>
+                <!-- Follow Form -->
+                <form action="backend/routes/follow.php" method="POST">
+                    <input type="hidden" name="followee_id" value="<?php echo $user['id']; ?>">
+                    <button type="submit">Follow</button>
+                </form>
+            <?php endif; ?>
+        </div>
+    <?php endforeach; ?>
 
     <h2>Post Something</h2>
     <form action="backend/routes/post.php" method="POST">
