@@ -11,11 +11,12 @@ require 'backend/db.php';
 $currentUserId = $_SESSION['user_id'];
 
 // Fetch all posts from the database
-$stmt = $pdo->query("SELECT posts.content, posts.created_at, users.username 
+$stmt = $pdo->query("SELECT posts.id, posts.content, posts.created_at, users.username 
                      FROM posts 
                      JOIN users ON posts.user_id = users.id 
                      ORDER BY posts.created_at DESC");
 $posts = $stmt->fetchAll();
+
 
 // Fetch users the current user may want to follow
 $usersStmt = $pdo->prepare("SELECT * FROM users WHERE id != ?");
@@ -71,16 +72,44 @@ $users = $usersStmt->fetchAll();
         <br>
         <button type="submit">Post</button>
     </form>
-
     <h2>All Posts</h2>
     <?php foreach ($posts as $post): ?>
         <div>
             <strong><?php echo htmlspecialchars($post['username']); ?>:</strong>
             <p><?php echo htmlspecialchars($post['content']); ?></p>
             <small>Posted on <?php echo $post['created_at']; ?></small>
+
+            <h4>Comments:</h4>
+            <?php
+            // Fetch comments for this post
+            $commentStmt = $pdo->prepare("SELECT comments.content, comments.created_at, users.username 
+                                      FROM comments 
+                                      JOIN users ON comments.user_id = users.id 
+                                      WHERE comments.post_id = ? 
+                                      ORDER BY comments.created_at ASC");
+            $commentStmt->execute([$post['id']]);
+            $comments = $commentStmt->fetchAll();
+            ?>
+
+            <?php foreach ($comments as $comment): ?>
+                <div>
+                    <strong><?php echo htmlspecialchars($comment['username']); ?>:</strong>
+                    <p><?php echo htmlspecialchars($comment['content']); ?></p>
+                    <small>Commented on <?php echo $comment['created_at']; ?></small>
+                </div>
+            <?php endforeach; ?>
+
+            <!-- Comment Form -->
+            <form action="backend/routes/comment.php" method="POST">
+                <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                <textarea name="content" rows="2" cols="50" placeholder="Write a comment..."></textarea>
+                <br>
+                <button type="submit">Comment</button>
+            </form>
             <hr>
         </div>
     <?php endforeach; ?>
+
 </body>
 
 </html>
