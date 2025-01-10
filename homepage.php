@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../../frontend/login.html");
+    header("Location: http://localhost/Mini-X/frontend/login.html");
     exit;
 }
 
@@ -27,10 +27,10 @@ $posts = $stmt->fetchAll();
 
 <body>
     <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
-    <a href="../backend/routes/logout.php">Logout</a>
+    <a href="backend/routes/logout.php">Logout</a>
 
     <h2>Post Something</h2>
-    <form action="../backend/routes/post.php" method="POST">
+    <form action="backend/routes/post.php" method="POST">
         <textarea name="content" rows="4" cols="50" placeholder="What's on your mind?"></textarea>
         <br>
         <button type="submit">Post</button>
