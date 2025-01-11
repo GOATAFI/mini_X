@@ -11,12 +11,11 @@ require 'backend/db.php';
 $currentUserId = $_SESSION['user_id'];
 
 // Fetch all posts from the database
-$stmt = $pdo->query("SELECT posts.id, posts.content, posts.created_at, users.username 
+$stmt = $pdo->query("SELECT posts.id, posts.content, posts.created_at, posts.user_id, users.username 
                      FROM posts 
                      JOIN users ON posts.user_id = users.id 
                      ORDER BY posts.created_at DESC");
 $posts = $stmt->fetchAll();
-
 
 // Fetch users the current user may want to follow
 $usersStmt = $pdo->prepare("SELECT * FROM users WHERE id != ?");
@@ -72,12 +71,25 @@ $users = $usersStmt->fetchAll();
         <br>
         <button type="submit">Post</button>
     </form>
+
     <h2>All Posts</h2>
     <?php foreach ($posts as $post): ?>
         <div>
             <strong><?php echo htmlspecialchars($post['username']); ?>:</strong>
             <p><?php echo htmlspecialchars($post['content']); ?></p>
             <small>Posted on <?php echo $post['created_at']; ?></small>
+
+            <?php if ($post['user_id'] === $currentUserId): ?>
+                <!-- Edit and Delete Options -->
+                <form action="backend/routes/edit_post.php" method="POST" style="display:inline;">
+                    <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                    <button type="submit">Edit</button>
+                </form>
+                <form action="backend/routes/delete_post.php" method="POST" style="display:inline;">
+                    <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                    <button type="submit" onclick="return confirm('Are you sure you want to delete this post?');">Delete</button>
+                </form>
+            <?php endif; ?>
 
             <h4>Comments:</h4>
             <?php
