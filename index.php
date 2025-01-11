@@ -1,3 +1,3 @@
 <?php
-require 'backend/db.php';
-echo "Connected successfully";
+
+header("Location: http://localhost/Mini-X/frontend/login.html");
