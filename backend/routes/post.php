@@ -1,29 +1,28 @@
 <?php
-require '../db.php';
+header('Content-Type: application/json');
+
+// Simulate the session check (replace with actual session logic)
 session_start();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_SESSION['user_id'])) {
-        echo "You must be logged in to post.";
-        exit;
-    }
-
-    $content = $_POST['content'] ?? null;
-
-    if (!$content) {
-        echo "Content cannot be empty.";
-        exit;
-    }
-
-    $stmt = $pdo->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
-    try {
-        $stmt->execute([$_SESSION['user_id'], $content]);
-        echo "Post added successfully!";
-        header("Location: http://localhost/Mini-X/homepage.php");
-        exit;
-    } catch (PDOException $e) {
-        echo "Failed to add post: " . $e->getMessage();
-    }
-} else {
-    echo "Invalid request method.";
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Unauthorized']);
+    exit;
 }
+
+require '../db.php';
+
+// Get POST data
+$data = json_decode(file_get_contents('php://input'), true);
+$content = $data['content'] ?? '';
+
+if (empty($content)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Content cannot be empty']);
+    exit;
+}
+
+// Insert into database
+$stmt = $pdo->prepare("INSERT INTO posts (user_id, content, created_at) VALUES (?, ?, NOW())");
+$stmt->execute([$_SESSION['user_id'], $content]);
+
+echo json_encode(['message' => 'Post created successfully']);

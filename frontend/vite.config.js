@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost", // Your PHP server URL
+        target: "http://localhost/Mini-X", // Your PHP server URL
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

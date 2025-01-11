@@ -1,7 +1,7 @@
 // src/services/api.js
 export const createPost = async (content) => {
   try {
-    const response = await fetch("/api/backend/routes/post.php", {
+    const response = await fetch("../../../backend/routes/post.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
