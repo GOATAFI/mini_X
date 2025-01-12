@@ -10,11 +10,14 @@ require 'backend/db.php';
 
 $currentUserId = $_SESSION['user_id'];
 
-$stmt = $pdo->query("SELECT posts.id, posts.content, posts.created_at, posts.user_id, users.username 
-                     FROM posts 
-                     JOIN users ON posts.user_id = users.id 
+$stmt = $pdo->query("SELECT posts.id, posts.content, posts.created_at, users.username, posts.user_id,
+                     (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) AS like_count,
+                     (SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id AND likes.user_id = $currentUserId) AS user_liked
+                     FROM posts
+                     JOIN users ON posts.user_id = users.id
                      ORDER BY posts.created_at DESC");
 $posts = $stmt->fetchAll();
+
 
 $usersStmt = $pdo->prepare("SELECT * FROM users WHERE id != ?");
 $usersStmt->execute([$currentUserId]);
@@ -80,6 +83,7 @@ $users = $usersStmt->fetchAll();
                                     </form>
                                 <?php endif; ?>
                             </div>
+
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -136,6 +140,38 @@ $users = $usersStmt->fetchAll();
                                 <?php endif; ?>
                             </div>
 
+                            <p class="text-gray-700 mb-4"><?php echo htmlspecialchars($post['content']); ?></p>
+
+                            <!-- Like Section -->
+                            <div class="flex items-center space-x-4 mb-6 border-t border-b border-gray-100 py-3">
+                                <div class="flex items-center space-x-2">
+                                    <?php if ($post['user_liked']): ?>
+                                        <form action="backend/routes/unlike.php" method="POST" class="inline">
+                                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                                            <button type="submit" class="flex items-center space-x-1 text-red-500 hover:text-red-600 transition duration-200">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                                                </svg>
+                                                <span>Unlike</span>
+                                            </button>
+                                        </form>
+                                    <?php else: ?>
+                                        <form action="backend/routes/like.php" method="POST" class="inline">
+                                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                                            <button type="submit" class="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition duration-200">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                </svg>
+                                                <span>Like</span>
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+                                    <span class="text-gray-600 text-sm">
+                                        <?php echo $post['like_count']; ?> <?php echo $post['like_count'] === 1 ? 'Like' : 'Likes'; ?>
+                                    </span>
+                                </div>
+                            </div>
+
                             <p class="text-gray-700 mb-6"><?php echo htmlspecialchars($post['content']); ?></p>
 
                             <!-- Comments Section -->
@@ -182,6 +218,11 @@ $users = $usersStmt->fetchAll();
                                     </button>
                                 </form>
                             </div>
+                        </div>
+                        <div>
+
+
+                            <hr>
                         </div>
                     <?php endforeach; ?>
                 </div>

@@ -14,4 +14,6 @@ $user_id = $_SESSION['user_id'];
 $stmt = $pdo->prepare("DELETE FROM likes WHERE post_id = ? AND user_id = ?");
 $stmt->execute([$post_id, $user_id]);
 
+
+header("Location: http://localhost/Mini-X/homepage.php"); // Redirect to homepage
 echo json_encode(['success' => 'Post unliked']);

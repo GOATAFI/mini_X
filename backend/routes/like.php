@@ -19,6 +19,7 @@ if (!$like) {
     // Add a new like
     $stmt = $pdo->prepare("INSERT INTO likes (post_id, user_id) VALUES (?, ?)");
     $stmt->execute([$post_id, $user_id]);
+    header("Location: http://localhost/Mini-X/homepage.php"); // Redirect to homepage
     echo json_encode(['success' => 'Post liked']);
 } else {
     echo json_encode(['error' => 'Already liked']);
