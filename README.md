@@ -19,7 +19,8 @@ You can also edit and delete your post , you can't delete other users' posts tho
 ![image](https://github.com/user-attachments/assets/fddfd150-92d7-4799-a78e-9292af2cda6e)
 
 There is an option for like and unlike button.
-![image](https://github.com/user-attachments/assets/eeb28f5d-62cb-401a-9650-078e8596a76c)
+![image](https://github.com/user-attachments/assets/756aaa3b-df4e-4895-881f-920cc8ff65ef)
+
 You can comment on your own or others' posts .
 ![image](https://github.com/user-attachments/assets/e83fdcb8-1366-41ba-a19b-6299e7e80192)
 ![image](https://github.com/user-attachments/assets/326d8b37-9189-4134-a9ea-0f1f4f24aeb8)
