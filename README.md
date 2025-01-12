@@ -25,6 +25,7 @@ You can comment on your own or others' posts .
 ![image](https://github.com/user-attachments/assets/e83fdcb8-1366-41ba-a19b-6299e7e80192)
 ![image](https://github.com/user-attachments/assets/326d8b37-9189-4134-a9ea-0f1f4f24aeb8)
 You can follow whoever you want.
+<br>
 ![image](https://github.com/user-attachments/assets/4ebdb55d-938e-4103-bb0b-55f16e13ac88)
 
 After clicking Logout button you are sent to Login page .
